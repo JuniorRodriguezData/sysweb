@@ -1,0 +1,6 @@
+# Registros de errores
+logs/*.log
+
+# Fotos subidas por los usuarios (se conserva solo la imagen por defecto)
+images/user/*
+!images/user/user-default.png
