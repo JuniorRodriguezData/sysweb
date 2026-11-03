@@ -61,9 +61,10 @@ CREATE TABLE clientes (
     cli_nombre    VARCHAR(30) NOT NULL,
     cli_apellido  VARCHAR(50) NOT NULL,
     cli_direccion VARCHAR(50) NULL,
-    cli_telefono  INT         NULL,
+    cli_telefono  VARCHAR(20) NULL,              -- texto: un INT pierde el 0 inicial (0981...)
     cod_ciudad    INT         NULL,
     PRIMARY KEY (id_cliente),
+    UNIQUE KEY uq_clientes_ci_ruc (ci_ruc),
     FOREIGN KEY (cod_ciudad) REFERENCES ciudad (cod_ciudad)
         ON UPDATE CASCADE ON DELETE NO ACTION
 ) ENGINE = InnoDB;
@@ -188,6 +189,10 @@ CREATE TABLE tmp (
 -- ---------------------------------------------------------------------
 INSERT INTO departamento VALUES (0, 'Asunción (Capital)'), (11, 'Central'), (7, 'Itapúa'), (10, 'Alto Paraná');
 INSERT INTO ciudad VALUES (1, 'Asunción', 0), (2, 'San Lorenzo', 11), (3, 'Luque', 11), (4, 'Encarnación', 7), (5, 'Ciudad del Este', 10);
+INSERT INTO clientes VALUES
+(1, '4567890', 'María', 'González', 'Avda. Mcal. López 1234', '0981123456', 1),
+(2, '80012345-6', 'Comercial', 'El Sol S.A.', 'Ruta 2 km 15', '021555666', 2),
+(3, '3214567', 'Carlos', 'Benítez', 'Calle Itá 456', '0971987654', 4);
 INSERT INTO deposito VALUES (1, 'Depósito Central');
 INSERT INTO u_medida VALUES (1, 'Unidad'), (2, 'Caja'), (3, 'Kilogramo');
 INSERT INTO tipo_producto VALUES (1, 'Informática'), (2, 'Librería');

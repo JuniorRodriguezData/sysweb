@@ -1,7 +1,7 @@
 @echo off
 REM SysWeb: enciende MySQL de XAMPP (si no esta corriendo), levanta PHP y abre el login.
 cd /d "%~dp0"
-netstat -ano | find ":3306" | find "LISTENING" >nul
+netstat -ano | find ":3306" | findstr /i "LISTENING ESCUCHANDO" >nul
 if errorlevel 1 (
     echo Iniciando MySQL de XAMPP...
     start "MySQL XAMPP" /min "C:\xampp\mysql\bin\mysqld.exe" --defaults-file=C:\xampp\mysql\bin\my.ini --standalone

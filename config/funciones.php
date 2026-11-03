@@ -26,6 +26,12 @@ const PERMISOS_MODULOS = [
     "form_profile" => ["Super Admin", "Compras", "Ventas"],
     "user"         => ["Super Admin"],
     "form_user"    => ["Super Admin"],
+    "departamento"      => ["Super Admin"],
+    "form_departamento" => ["Super Admin"],
+    "ciudad"            => ["Super Admin"],
+    "form_ciudad"       => ["Super Admin"],
+    "clientes"          => ["Super Admin", "Ventas"],
+    "form_clientes"     => ["Super Admin", "Ventas"],
     "compras"      => ["Super Admin", "Compras"],
     "ventas"       => ["Super Admin", "Ventas"],
     "stock"        => ["Super Admin", "Compras", "Ventas"],
@@ -56,6 +62,23 @@ function csrf_campo(): string
 function csrf_valido(): bool
 {
     return isset($_POST["csrf"], $_SESSION["csrf"]) && hash_equals($_SESSION["csrf"], $_POST["csrf"]);
+}
+
+/**
+ * Siguiente código para las tablas referenciales (sus claves no son AUTO_INCREMENT en el
+ * script de la cátedra). Tabla y campo salen de una lista fija: nunca vienen del usuario.
+ */
+function siguiente_codigo(mysqli $mysqli, string $tabla): int
+{
+    $claves = ["departamento" => "id_departamento", "ciudad" => "cod_ciudad", "clientes" => "id_cliente"];
+    $campo  = $claves[$tabla] ?? throw new InvalidArgumentException("Tabla no permitida: $tabla");
+    return (int) $mysqli->query("SELECT COALESCE(MAX($campo), 0) + 1 FROM $tabla")->fetch_row()[0];
+}
+
+/** ¿La excepción de mysqli es por una clave foránea en uso (el registro está referenciado)? */
+function es_registro_en_uso(mysqli_sql_exception $e): bool
+{
+    return $e->getCode() === 1451;
 }
 
 /** Niveles de usuario del sistema. */

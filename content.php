@@ -10,6 +10,12 @@ $vistas = [
     "form_user"    => "modules/user/form.php",
     "profile"      => "modules/profile/view.php",
     "form_profile" => "modules/profile/form.php",
+    "departamento"      => "modules/departamento/view.php",
+    "form_departamento" => "modules/departamento/form.php",
+    "ciudad"            => "modules/ciudad/view.php",
+    "form_ciudad"       => "modules/ciudad/form.php",
+    "clientes"          => "modules/clientes/view.php",
+    "form_clientes"     => "modules/clientes/form.php",
 ];
 
 if (!isset(PERMISOS_MODULOS[$module])) {

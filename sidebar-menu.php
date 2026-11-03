@@ -16,13 +16,13 @@ $activo = fn(string ...$modulos) => in_array($module, $modulos, true) ? "active"
     </li>
 
     <?php if ($nivel === "Super Admin"): ?>
-        <li class="treeview">
+        <li class="treeview <?= $activo("departamento", "form_departamento", "ciudad", "form_ciudad") ?>">
             <a href="javascript:void(0);">
                 <i class="fa fa-file-text"></i><span>Referenciales Generales</span><i class="fa fa-angle-left pull-right"></i>
             </a>
             <ul class="treeview-menu">
-                <li><a href="#"><i class="fa fa-circle-o"></i> Departamento</a></li>
-                <li><a href="#"><i class="fa fa-circle-o"></i> Ciudad</a></li>
+                <li class="<?= $activo("departamento", "form_departamento") ?>"><a href="?module=departamento"><i class="fa fa-circle-o"></i> Departamento</a></li>
+                <li class="<?= $activo("ciudad", "form_ciudad") ?>"><a href="?module=ciudad"><i class="fa fa-circle-o"></i> Ciudad</a></li>
             </ul>
         </li>
     <?php endif; ?>
@@ -42,12 +42,12 @@ $activo = fn(string ...$modulos) => in_array($module, $modulos, true) ? "active"
     <?php endif; ?>
 
     <?php if ($nivel === "Super Admin" || $nivel === "Ventas"): ?>
-        <li class="treeview">
+        <li class="treeview <?= $activo("clientes", "form_clientes") ?>">
             <a href="javascript:void(0);">
                 <i class="fa fa-certificate"></i><span>Referenciales de Ventas</span><i class="fa fa-angle-left pull-right"></i>
             </a>
             <ul class="treeview-menu">
-                <li><a href="#"><i class="fa fa-circle-o"></i> Clientes</a></li>
+                <li class="<?= $activo("clientes", "form_clientes") ?>"><a href="?module=clientes"><i class="fa fa-circle-o"></i> Clientes</a></li>
             </ul>
         </li>
     <?php endif; ?>
