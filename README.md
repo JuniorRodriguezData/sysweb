@@ -17,14 +17,19 @@ etapas del proyecto de la cátedra.
 | **Proyecto 7** – Referencial Ciudad | Vista, formulario para agregar y editar, y eliminación verificada | `modules/ciudad/` |
 | **Proyecto 8** – Reportes PDF | Composer + librería HTML2PDF; botón **Imprimir** que genera el PDF | `composer.json`, `config/reporte.php`, `modules/*/reporte.php` |
 | **Proyecto 9** – Clientes | Lista, agregar, modificar, eliminar y reporte PDF de clientes | `modules/clientes/` |
+| **Proyecto 10** – Movimiento de compras | Vistas `v_compras` y `v_det_compra`; listado, detalle e impresión del formulario de compra | `modules/compras/view.php`, `detalle.php`, `imprimir.php` |
+| **Proyecto 11** – Registro de compras | Formulario de compra y ventana modal para seleccionar productos | `modules/compras/form.php` |
+| **Proyecto 12** – Carga dinámica | JavaScript (AJAX) que carga los productos con búsqueda y paginación | `modules/compras/productos_pedidos.php`, `paginacion.php` |
+| **Proyecto 13** – Procesar compras | Importes y total, registrar y anular compras (con transacción) y trigger `borrar_temp` | `modules/compras/tmp.php`, `proses.php`, `sql/sysweb.sql` |
+| **Proyecto 14** – Stock | Existencias por depósito, valor del inventario y reporte PDF | `modules/stock/` |
 
 ## Niveles de usuario
 
 | Nivel | Puede usar |
 |---|---|
 | **Super Admin** | Todo: referenciales generales (departamento, ciudad), de compras y de ventas, y la administración de usuarios |
-| **Compras** | Referenciales de compras, compras y stock |
-| **Ventas** | Referenciales de ventas (clientes y su reporte), ventas y stock |
+| **Compras** | Compras (registrar, consultar, imprimir y anular) y stock |
+| **Ventas** | Clientes (y su reporte) y consulta de stock |
 
 Todos pueden ver y modificar su perfil y cambiar su contraseña. Los permisos están definidos en
 `config/funciones.php` (`PERMISOS_MODULOS`): el menú se arma con ellos y **`content.php` y cada `proses.php` los
@@ -46,6 +51,13 @@ vuelven a verificar en el servidor**, porque ocultar una opción del menú no es
 - **Eliminación controlada**: antes de borrar se verifica que el registro exista y que el usuario tenga permiso; no se
   elimina un departamento con ciudades, una ciudad con clientes ni un cliente con ventas (integridad referencial).
 - **Reportes PDF** protegidos: solo los genera un usuario con sesión y permiso sobre el módulo.
+- **Compras en transacción**: la cabecera, el detalle y la suma al stock se guardan juntos o no se guarda nada.
+  Anular no borra la compra (queda en estado *anulado*) y descuenta el stock solo si alcanza.
+- **Trigger `borrar_temp` por sesión**: el script de la cátedra vaciaba toda la tabla `tmp` (y con eso los
+  productos que estaban cargando otros usuarios); acá PHP pasa el id de sesión en `@tmp_session` y el trigger
+  borra solo los de esa sesión.
+- La carga de productos (AJAX) también verifica sesión, permiso y token CSRF; cada usuario solo ve y quita sus
+  propios renglones temporales.
 
 ## Requisitos
 
@@ -97,14 +109,22 @@ sysweb/
 │   ├── profile/         Perfil del usuario
 │   ├── departamento/    Referencial Departamento (+ reporte PDF)
 │   ├── ciudad/          Referencial Ciudad (+ reporte PDF)
-│   └── clientes/        Referencial Clientes (+ reporte PDF)
+│   ├── clientes/        Referencial Clientes (+ reporte PDF)
+│   ├── compras/         Compras: listado, detalle, formulario, AJAX, procesar e imprimir
+│   └── stock/           Stock de productos (+ reporte PDF)
 ├── sql/sysweb.sql       Base de datos
 ├── assets/              CSS, JS y plugins (AdminLTE, Bootstrap, DataTables…)
 ├── images/user/         Fotos de los usuarios
 └── logs/                Registro de errores
 ```
 
-## Próximas etapas
+## Verificación final (Proyecto 14)
 
-Referenciales de compras (depósito, proveedor, producto, unidad de medida) y los movimientos de compras, ventas y
-stock, sobre las tablas que ya están creadas en `sql/sysweb.sql`.
+| Funcionalidad | Dónde probarla |
+|---|---|
+| Acceso al sistema y administración de usuarios | Login · Administrar usuarios |
+| Gestión de datos referenciales | Referenciales Generales: Departamento y Ciudad |
+| Administración de clientes | Referenciales de Ventas: Clientes |
+| Registro, consulta y anulación de compras | Movimientos: Compras |
+| Generación e impresión de reportes | Botón **Imprimir** en cada módulo y en cada compra |
+| Consulta del stock de productos | Movimientos: Stock de productos |

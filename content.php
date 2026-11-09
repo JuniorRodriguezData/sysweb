@@ -16,6 +16,10 @@ $vistas = [
     "form_ciudad"       => "modules/ciudad/form.php",
     "clientes"          => "modules/clientes/view.php",
     "form_clientes"     => "modules/clientes/form.php",
+    "compras"           => "modules/compras/view.php",
+    "form_compras"      => "modules/compras/form.php",
+    "detalle_compra"    => "modules/compras/detalle.php",
+    "stock"             => "modules/stock/view.php",
 ];
 
 if (!isset(PERMISOS_MODULOS[$module])) {

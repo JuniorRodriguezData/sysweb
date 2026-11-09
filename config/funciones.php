@@ -33,6 +33,8 @@ const PERMISOS_MODULOS = [
     "clientes"          => ["Super Admin", "Ventas"],
     "form_clientes"     => ["Super Admin", "Ventas"],
     "compras"      => ["Super Admin", "Compras"],
+    "form_compras"    => ["Super Admin", "Compras"],
+    "detalle_compra"  => ["Super Admin", "Compras"],
     "ventas"       => ["Super Admin", "Ventas"],
     "stock"        => ["Super Admin", "Compras", "Ventas"],
 ];
@@ -70,7 +72,7 @@ function csrf_valido(): bool
  */
 function siguiente_codigo(mysqli $mysqli, string $tabla): int
 {
-    $claves = ["departamento" => "id_departamento", "ciudad" => "cod_ciudad", "clientes" => "id_cliente"];
+    $claves = ["departamento" => "id_departamento", "ciudad" => "cod_ciudad", "clientes" => "id_cliente", "compra" => "cod_compra"];
     $campo  = $claves[$tabla] ?? throw new InvalidArgumentException("Tabla no permitida: $tabla");
     return (int) $mysqli->query("SELECT COALESCE(MAX($campo), 0) + 1 FROM $tabla")->fetch_row()[0];
 }
@@ -79,6 +81,12 @@ function siguiente_codigo(mysqli $mysqli, string $tabla): int
 function es_registro_en_uso(mysqli_sql_exception $e): bool
 {
     return $e->getCode() === 1451;
+}
+
+/** Formatea un importe en guaraníes: 1500000 -> 1.500.000 */
+function gs(int|float|string|null $monto): string
+{
+    return number_format((float) $monto, 0, ",", ".");
 }
 
 /** Niveles de usuario del sistema. */

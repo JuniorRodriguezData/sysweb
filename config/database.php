@@ -10,6 +10,9 @@ $username = "root";
 $password = "";
 $database = "sysweb";
 
+// Hora de Paraguay para fechas y horas de compras y reportes (XAMPP trae Europe/Berlin por defecto)
+date_default_timezone_set("America/Asuncion");
+
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);   // errores de BD como excepciones
 
 if (!function_exists("sysweb_error")) {
@@ -29,3 +32,4 @@ if (!function_exists("sysweb_error")) {
 
 $mysqli = new mysqli($server, $username, $password, $database);
 $mysqli->set_charset("utf8mb4");
+$mysqli->query("SET collation_connection = 'utf8mb4_unicode_ci'");   // la misma intercalación que las tablas

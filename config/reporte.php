@@ -16,8 +16,12 @@ use Spipu\Html2Pdf\Exception\Html2PdfException;
  * @param array  $filas     Filas de datos (arreglos con los valores en el mismo orden que las columnas).
  * @param string $archivo   Nombre del archivo PDF.
  * @param string $orientacion "P" vertical o "L" horizontal.
+ * @param string $antes     HTML ya escapado que va antes de la tabla (ej.: cabecera de una compra).
+ * @param string $despues   HTML ya escapado que va después de la tabla (ej.: total).
+ * @param array  $alinear_derecha Índices de columnas numéricas que se alinean a la derecha.
  */
-function generar_reporte(string $titulo, array $columnas, array $filas, string $archivo, string $orientacion = "P"): void
+function generar_reporte(string $titulo, array $columnas, array $filas, string $archivo, string $orientacion = "P",
+                         string $antes = "", string $despues = "", array $alinear_derecha = []): void
 {
     $logo    = __DIR__ . "/../assets/img/logo-blue.png";
     $usuario = e($_SESSION["name_user"] ?? "");
@@ -56,6 +60,7 @@ function generar_reporte(string $titulo, array $columnas, array $filas, string $
             </table>
         </page_footer>
 
+        <?= $antes ?>
         <table class="datos">
             <thead>
                 <tr>
@@ -67,8 +72,8 @@ function generar_reporte(string $titulo, array $columnas, array $filas, string $
             <tbody>
                 <?php foreach ($filas as $i => $fila): ?>
                     <tr class="<?= $i % 2 ? "par" : "" ?>">
-                        <?php foreach (array_values($fila) as $valor): ?>
-                            <td><?= e((string) $valor) ?></td>
+                        <?php foreach (array_values($fila) as $col => $valor): ?>
+                            <td<?= in_array($col, $alinear_derecha, true) ? ' style="text-align: right;"' : "" ?>><?= e((string) $valor) ?></td>
                         <?php endforeach; ?>
                     </tr>
                 <?php endforeach; ?>
@@ -77,7 +82,11 @@ function generar_reporte(string $titulo, array $columnas, array $filas, string $
                 <?php endif; ?>
             </tbody>
         </table>
-        <p class="sub">Total de registros: <?= count($filas) ?></p>
+        <?php if ($despues !== ""): ?>
+            <?= $despues ?>
+        <?php else: ?>
+            <p class="sub">Total de registros: <?= count($filas) ?></p>
+        <?php endif; ?>
     </page>
     <?php
     $html = ob_get_clean();

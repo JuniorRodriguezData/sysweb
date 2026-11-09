@@ -181,8 +181,59 @@ CREATE TABLE tmp (
     cantidad_tmp INT          NULL,
     precio_tmp   INT          NULL,
     session_id   VARCHAR(255) NULL,
-    PRIMARY KEY (id_tmp)
+    PRIMARY KEY (id_tmp),
+    KEY idx_tmp_session (session_id)
 ) ENGINE = InnoDB;
+
+-- ---------------------------------------------------------------------
+-- Proyecto 10 - Vistas de la cátedra (con estado agregado, para mostrar compras anuladas)
+-- ---------------------------------------------------------------------
+CREATE VIEW v_compras AS
+SELECT comp.cod_compra,
+       prov.cod_proveedor, prov.razon_social,
+       dep.cod_deposito, dep.descrip,
+       comp.nro_factura, comp.fecha, comp.hora, comp.total_compra, comp.estado,
+       usu.id_user, usu.name_user
+FROM compra comp
+JOIN proveedor prov ON comp.cod_proveedor = prov.cod_proveedor
+JOIN deposito  dep  ON comp.cod_deposito  = dep.cod_deposito
+JOIN usuarios  usu  ON comp.id_user       = usu.id_user;
+
+CREATE VIEW v_det_compra AS
+SELECT comp.cod_compra,
+       pro.cod_producto, tpro.t_p_descrip, um.u_descrip, pro.p_descrip,
+       det.precio, det.cantidad
+FROM detalle_compra det
+JOIN compra        comp ON det.cod_compra    = comp.cod_compra
+JOIN producto      pro  ON det.cod_producto  = pro.cod_producto
+JOIN tipo_producto tpro ON pro.cod_tipo_prod = tpro.cod_tipo_prod
+JOIN u_medida      um   ON pro.id_u_medida   = um.id_u_medida;
+
+-- Proyecto 14 - Stock por depósito y producto
+CREATE VIEW v_stock AS
+SELECT dep.cod_deposito, dep.descrip AS deposito,
+       pro.cod_producto, pro.p_descrip, tpro.t_p_descrip, um.u_descrip, pro.precio,
+       st.cantidad
+FROM stock st
+JOIN deposito      dep  ON st.cod_deposito   = dep.cod_deposito
+JOIN producto      pro  ON st.cod_producto   = pro.cod_producto
+JOIN tipo_producto tpro ON pro.cod_tipo_prod = tpro.cod_tipo_prod
+JOIN u_medida      um   ON pro.id_u_medida   = um.id_u_medida;
+
+-- ---------------------------------------------------------------------
+-- Proyecto 13 - Trigger de la cátedra: después de registrar una compra se vacía tmp.
+-- Mejora: el original hacía "DELETE FROM tmp" y borraba también lo que estaban cargando
+-- otros usuarios. PHP guarda el id de sesión en la variable @tmp_session antes del INSERT
+-- y el trigger borra solo los productos temporales de esa sesión.
+-- ---------------------------------------------------------------------
+DELIMITER $$
+CREATE TRIGGER borrar_temp AFTER INSERT ON compra
+FOR EACH ROW
+BEGIN
+    -- COLLATE: la variable toma la intercalación de la conexión y la columna usa utf8mb4_unicode_ci
+    DELETE FROM tmp WHERE session_id = @tmp_session COLLATE utf8mb4_unicode_ci;
+END$$
+DELIMITER ;
 
 -- ---------------------------------------------------------------------
 -- Datos de referencia mínimos
@@ -193,6 +244,25 @@ INSERT INTO clientes VALUES
 (1, '4567890', 'María', 'González', 'Avda. Mcal. López 1234', '0981123456', 1),
 (2, '80012345-6', 'Comercial', 'El Sol S.A.', 'Ruta 2 km 15', '021555666', 2),
 (3, '3214567', 'Carlos', 'Benítez', 'Calle Itá 456', '0971987654', 4);
-INSERT INTO deposito VALUES (1, 'Depósito Central');
-INSERT INTO u_medida VALUES (1, 'Unidad'), (2, 'Caja'), (3, 'Kilogramo');
-INSERT INTO tipo_producto VALUES (1, 'Informática'), (2, 'Librería');
+INSERT INTO deposito VALUES (1, 'Depósito Central'), (2, 'Depósito Sucursal Luque');
+INSERT INTO u_medida VALUES (1, 'Unidad'), (2, 'Caja'), (3, 'Kilogramo'), (4, 'Resma');
+INSERT INTO tipo_producto VALUES (1, 'Informática'), (2, 'Librería'), (3, 'Limpieza');
+
+INSERT INTO proveedor VALUES
+(1, 'Distribuidora Tecno S.A.',    '80045678', 'Avda. Eusebio Ayala 2500', 21500100),
+(2, 'Papelera Guaraní S.R.L.',     '80098765', 'Ruta Mcal. Estigarribia km 9', 21600200),
+(3, 'Importadora del Este S.A.',   '80011223', 'Avda. San Blas 150, CDE', 61500300);
+
+INSERT INTO producto (cod_producto, cod_tipo_prod, id_u_medida, p_descrip, precio) VALUES
+(1, 1, 1, 'Mouse inalámbrico',          85000),
+(2, 1, 1, 'Teclado USB',                65000),
+(3, 1, 1, 'Monitor 24 pulgadas',      1200000),
+(4, 1, 1, 'Pendrive 64 GB',             55000),
+(5, 1, 1, 'Cable HDMI 2 m',             30000),
+(6, 2, 4, 'Papel A4 75 g',              38000),
+(7, 2, 2, 'Bolígrafos azules x 50',     45000),
+(8, 2, 1, 'Cuaderno universitario',     18000),
+(9, 2, 1, 'Carpeta archivadora',        22000),
+(10, 3, 3, 'Detergente en polvo',       25000),
+(11, 3, 1, 'Alcohol en gel 1 L',        28000),
+(12, 1, 1, 'Auriculares con micrófono', 95000);

@@ -52,6 +52,16 @@ $activo = fn(string ...$modulos) => in_array($module, $modulos, true) ? "active"
         </li>
     <?php endif; ?>
 
+    <li class="header">MOVIMIENTOS</li>
+    <?php if (puede("compras")): ?>
+        <li class="<?= $activo("compras", "form_compras", "detalle_compra") ?>">
+            <a href="?module=compras"><i class="fa fa-shopping-cart"></i> <span>Compras</span></a>
+        </li>
+    <?php endif; ?>
+    <li class="<?= $activo("stock") ?>">
+        <a href="?module=stock"><i class="fa fa-cubes"></i> <span>Stock de productos</span></a>
+    </li>
+
     <?php if (puede("user")): ?>
         <li class="<?= $activo("user", "form_user") ?>">
             <a href="?module=user"><i class="fa fa-users"></i> <span>Administrar usuarios</span></a>

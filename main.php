@@ -22,6 +22,7 @@ $module = $_GET["module"] ?? "start";
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <meta name="description" content="Sistema Web de Compras, Ventas y Stock - UTIC">
     <meta name="author" content="Junior Rodriguez" />
+    <meta name="csrf" content="<?= csrf_token() ?>" />
     <link rel="shortcut icon" href="assets/img/favicon.ico" />
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
