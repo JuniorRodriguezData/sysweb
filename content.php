@@ -20,6 +20,21 @@ $vistas = [
     "form_compras"      => "modules/compras/form.php",
     "detalle_compra"    => "modules/compras/detalle.php",
     "stock"             => "modules/stock/view.php",
+    // Examen final - Referenciales de compras
+    "u_medida"           => "modules/u_medida/view.php",
+    "form_u_medida"      => "modules/u_medida/form.php",
+    "tipo_producto"      => "modules/tipo_producto/view.php",
+    "form_tipo_producto" => "modules/tipo_producto/form.php",
+    "deposito"           => "modules/deposito/view.php",
+    "form_deposito"      => "modules/deposito/form.php",
+    "producto"           => "modules/producto/view.php",
+    "form_producto"      => "modules/producto/form.php",
+    "proveedor"          => "modules/proveedor/view.php",
+    "form_proveedor"     => "modules/proveedor/form.php",
+    // Examen final - Movimiento de ventas
+    "ventas"            => "modules/ventas/view.php",
+    "form_ventas"       => "modules/ventas/form.php",
+    "detalle_venta"     => "modules/ventas/detalle.php",
 ];
 
 if (!isset(PERMISOS_MODULOS[$module])) {

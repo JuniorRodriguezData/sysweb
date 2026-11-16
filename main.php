@@ -133,7 +133,7 @@ $module = $_GET["module"] ?? "start";
       };
       $(function () {
         $(".date-picker").datepicker({ autoclose: true, todayHighlight: true });
-        $(".chosen-select").chosen({ allow_single_deselect: true });
+        $(".chosen-select").chosen({ allow_single_deselect: true, search_contains: true, no_results_text: "Sin resultados para" });
         $("#dataTables1").dataTable({ "language": idioma_espanol });
       });
     </script>

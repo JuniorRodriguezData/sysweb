@@ -1,9 +1,14 @@
 <?php
 /**
  * Proyecto 14 - Stock de productos: existencias por depósito.
+ * Examen final - Combo buscador de productos (plugin Chosen) que filtra la carga de la tabla.
  */
 $depositos = $mysqli->query("SELECT cod_deposito, descrip FROM deposito ORDER BY cod_deposito")->fetch_all(MYSQLI_ASSOC);
+$lista_productos = $mysqli->query("SELECT p.cod_producto, p.p_descrip, t.t_p_descrip
+                                   FROM producto p JOIN tipo_producto t ON t.cod_tipo_prod = p.cod_tipo_prod
+                                   ORDER BY p.p_descrip")->fetch_all(MYSQLI_ASSOC);
 $deposito  = (int) ($_GET["deposito"] ?? 0);   // 0 = todos los depósitos
+$producto  = (int) ($_GET["producto"] ?? 0);   // 0 = todos los productos
 
 $sql = "SELECT d.descrip AS deposito, p.cod_producto, p.p_descrip, t.t_p_descrip, u.u_descrip, p.precio,
                COALESCE(s.cantidad, 0) AS cantidad
@@ -13,9 +18,10 @@ $sql = "SELECT d.descrip AS deposito, p.cod_producto, p.p_descrip, t.t_p_descrip
         JOIN u_medida u      ON u.id_u_medida   = p.id_u_medida
         LEFT JOIN stock s    ON s.cod_producto  = p.cod_producto AND s.cod_deposito = d.cod_deposito
         WHERE (? = 0 OR d.cod_deposito = ?)
+          AND (? = 0 OR p.cod_producto = ?)   -- filtro del combo buscador
         ORDER BY d.cod_deposito, p.p_descrip";
 $stmt = $mysqli->prepare($sql);
-$stmt->bind_param("ii", $deposito, $deposito);
+$stmt->bind_param("iiii", $deposito, $deposito, $producto, $producto);
 $stmt->execute();
 $filas = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
@@ -25,7 +31,7 @@ $sin_stock   = count(array_filter($filas, fn($f) => (int) $f["cantidad"] === 0))
 <section class="content-header">
     <h1>
         <i class="fa fa-cubes icon-title"></i> Stock de productos
-        <a class="btn btn-default btn-social pull-right" href="modules/stock/reporte.php?deposito=<?= $deposito ?>" target="_blank" title="Imprimir reporte" data-toggle="tooltip">
+        <a class="btn btn-default btn-social pull-right" href="modules/stock/reporte.php?deposito=<?= $deposito ?>&producto=<?= $producto ?>" target="_blank" title="Imprimir reporte" data-toggle="tooltip">
             <i class="fa fa-print"></i> Imprimir
         </a>
     </h1>
@@ -69,7 +75,7 @@ $sin_stock   = count(array_filter($filas, fn($f) => (int) $f["cantidad"] === 0))
 
     <div class="box box-primary">
         <div class="box-header with-border">
-            <form method="GET" class="form-inline">
+            <form method="GET" class="form-inline" id="form_filtro_stock">
                 <input type="hidden" name="module" value="stock">
                 <label>Depósito:&nbsp;</label>
                 <select name="deposito" class="form-control" onchange="this.form.submit()">
@@ -78,6 +84,20 @@ $sin_stock   = count(array_filter($filas, fn($f) => (int) $f["cantidad"] === 0))
                         <option value="<?= (int) $d["cod_deposito"] ?>" <?= $deposito === (int) $d["cod_deposito"] ? "selected" : "" ?>><?= e($d["descrip"]) ?></option>
                     <?php endforeach; ?>
                 </select>
+                &nbsp;&nbsp;<label>Producto:&nbsp;</label>
+                <!-- Combo buscador: Chosen permite escribir para buscar el producto -->
+                <select name="producto" id="buscar_producto" class="form-control chosen-select" style="width:340px"
+                        data-placeholder="Escriba para buscar un producto..." onchange="this.form.submit()">
+                    <option value="0">Todos los productos</option>
+                    <?php foreach ($lista_productos as $lp): ?>
+                        <option value="<?= (int) $lp["cod_producto"] ?>" <?= $producto === (int) $lp["cod_producto"] ? "selected" : "" ?>>
+                            <?= (int) $lp["cod_producto"] ?> - <?= e($lp["p_descrip"]) ?> (<?= e($lp["t_p_descrip"]) ?>)
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <?php if ($producto || $deposito): ?>
+                    &nbsp;<a href="?module=stock" class="btn btn-default btn-sm"><i class="fa fa-times"></i> Quitar filtros</a>
+                <?php endif; ?>
             </form>
         </div>
         <div class="box-body">

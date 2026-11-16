@@ -23,6 +23,18 @@ etapas del proyecto de la cátedra.
 | **Proyecto 13** – Procesar compras | Importes y total, registrar y anular compras (con transacción) y trigger `borrar_temp` | `modules/compras/tmp.php`, `proses.php`, `sql/sysweb.sql` |
 | **Proyecto 14** – Stock | Existencias por depósito, valor del inventario y reporte PDF | `modules/stock/` |
 
+## Examen final (40 puntos)
+
+| Criterio | Qué se hizo | Archivos |
+|---|---|---|
+| **Formularios referenciales** (16) | `u_medida`, `tipo_producto`, `deposito`, `producto` y `proveedor`, cada uno con **view** (listado), **form** (agregar/modificar), **proses** (insertar, modificar y eliminar, con validaciones en el servidor), **print** (listado PDF) y **print view** (ficha PDF del registro con sus datos relacionados) | `modules/u_medida/`, `modules/tipo_producto/`, `modules/deposito/`, `modules/producto/`, `modules/proveedor/` |
+| **Vistas según perfil** (6) | Inicio (start) con bloques de movimientos y de referenciales según el nivel; menú lateral con *Referenciales de Compras* y *Compras* para el perfil Compras, y *Referenciales de Ventas* y *Ventas* para el perfil Ventas. Los permisos también se controlan en el servidor | `modules/start/view.php`, `sidebar-menu.php`, `config/funciones.php` |
+| **Movimiento de ventas** (14) | Formulario con cliente (combo buscador), factura, fecha y depósito; ventana modal con los productos y su stock disponible; detalle en `tmp_venta`; al guardar se descuenta el stock dentro de una transacción. **Anular** devuelve las cantidades al stock del depósito de origen y deja la cabecera en estado `anulado` (no se puede anular dos veces) | `modules/ventas/`, `sql/examen_final.sql` |
+| **Formulario de stock** (4) | Combo buscador de productos (plugin Chosen) que filtra la carga de la tabla en `view.php` (y el reporte PDF) | `modules/stock/view.php`, `modules/stock/reporte.php` |
+
+Cambios en la base de datos: `sql/examen_final.sql` (tabla `tmp_venta`, vistas `v_ventas` y `v_det_venta`, trigger
+`borrar_temp_venta`, columna `venta.id_user` y teléfono del proveedor como texto). `sql/sysweb.sql` ya los incluye.
+
 ## Niveles de usuario
 
 | Nivel | Puede usar |
@@ -77,6 +89,10 @@ vuelven a verificar en el servidor**, porque ocultar una opción del menú no es
    C:\xampp\mysql\bin\mysql.exe -u root --default-character-set=utf8mb4 < sql\sysweb.sql
    ```
    o importar `sql/sysweb.sql` desde phpMyAdmin.
+   Si la base ya existía de las etapas anteriores, alcanza con aplicar los cambios del examen final:
+   ```
+   C:\xampp\mysql\bin\mysql.exe -u root --default-character-set=utf8mb4 sysweb < sql\examen_final.sql
+   ```
 4. Si hace falta, ajustar usuario y contraseña de MySQL en `config/database.php`.
 5. Abrir `http://localhost/sysweb/` (o, sin Apache, ejecutar `ABRIR_PROGRAMA.bat`, que usa el servidor de PHP en
    `http://localhost:8070`).
@@ -111,8 +127,15 @@ sysweb/
 │   ├── ciudad/          Referencial Ciudad (+ reporte PDF)
 │   ├── clientes/        Referencial Clientes (+ reporte PDF)
 │   ├── compras/         Compras: listado, detalle, formulario, AJAX, procesar e imprimir
-│   └── stock/           Stock de productos (+ reporte PDF)
-├── sql/sysweb.sql       Base de datos
+│   ├── u_medida/        Referencial Unidad de medida (view, form, proses, print, print_view)
+│   ├── tipo_producto/   Referencial Tipo de producto (view, form, proses, print, print_view)
+│   ├── deposito/        Referencial Depósito (view, form, proses, print, print_view)
+│   ├── producto/        Referencial Producto (view, form, proses, print, print_view)
+│   ├── proveedor/       Referencial Proveedor (view, form, proses, print, print_view)
+│   ├── ventas/          Ventas: listado, detalle, formulario, AJAX, procesar, anular e imprimir
+│   └── stock/           Stock de productos con combo buscador (+ reporte PDF)
+├── sql/sysweb.sql       Base de datos (instalación completa)
+├── sql/examen_final.sql Cambios del examen final sobre una base existente
 ├── assets/              CSS, JS y plugins (AdminLTE, Bootstrap, DataTables…)
 ├── images/user/         Fotos de los usuarios
 └── logs/                Registro de errores
@@ -128,3 +151,6 @@ sysweb/
 | Registro, consulta y anulación de compras | Movimientos: Compras |
 | Generación e impresión de reportes | Botón **Imprimir** en cada módulo y en cada compra |
 | Consulta del stock de productos | Movimientos: Stock de productos |
+| Referenciales de compras | Usuario `compras`: Depósito, Proveedor, Producto, Tipo de producto, Unidad de medida |
+| Registro y anulación de ventas (con stock) | Usuario `ventas`: Movimientos → Ventas |
+| Buscador de productos en el stock | Movimientos → Stock de productos → combo *Producto* |

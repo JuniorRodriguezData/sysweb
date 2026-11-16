@@ -28,15 +28,17 @@ $activo = fn(string ...$modulos) => in_array($module, $modulos, true) ? "active"
     <?php endif; ?>
 
     <?php if ($nivel === "Super Admin" || $nivel === "Compras"): ?>
-        <li class="treeview">
+        <li class="treeview <?= $activo("deposito", "form_deposito", "proveedor", "form_proveedor", "producto", "form_producto",
+                                        "u_medida", "form_u_medida", "tipo_producto", "form_tipo_producto") ?>">
             <a href="javascript:void(0);">
                 <i class="fa fa-truck"></i><span>Referenciales de Compras</span><i class="fa fa-angle-left pull-right"></i>
             </a>
             <ul class="treeview-menu">
-                <li><a href="#"><i class="fa fa-circle-o"></i> Depósito</a></li>
-                <li><a href="#"><i class="fa fa-circle-o"></i> Proveedor</a></li>
-                <li><a href="#"><i class="fa fa-circle-o"></i> Producto</a></li>
-                <li><a href="#"><i class="fa fa-circle-o"></i> Unidad de medida</a></li>
+                <li class="<?= $activo("deposito", "form_deposito") ?>"><a href="?module=deposito"><i class="fa fa-circle-o"></i> Depósito</a></li>
+                <li class="<?= $activo("proveedor", "form_proveedor") ?>"><a href="?module=proveedor"><i class="fa fa-circle-o"></i> Proveedor</a></li>
+                <li class="<?= $activo("producto", "form_producto") ?>"><a href="?module=producto"><i class="fa fa-circle-o"></i> Producto</a></li>
+                <li class="<?= $activo("tipo_producto", "form_tipo_producto") ?>"><a href="?module=tipo_producto"><i class="fa fa-circle-o"></i> Tipo de producto</a></li>
+                <li class="<?= $activo("u_medida", "form_u_medida") ?>"><a href="?module=u_medida"><i class="fa fa-circle-o"></i> Unidad de medida</a></li>
             </ul>
         </li>
     <?php endif; ?>
@@ -56,6 +58,11 @@ $activo = fn(string ...$modulos) => in_array($module, $modulos, true) ? "active"
     <?php if (puede("compras")): ?>
         <li class="<?= $activo("compras", "form_compras", "detalle_compra") ?>">
             <a href="?module=compras"><i class="fa fa-shopping-cart"></i> <span>Compras</span></a>
+        </li>
+    <?php endif; ?>
+    <?php if (puede("ventas")): ?>
+        <li class="<?= $activo("ventas", "form_ventas", "detalle_venta") ?>">
+            <a href="?module=ventas"><i class="fa fa-cart-plus"></i> <span>Ventas</span></a>
         </li>
     <?php endif; ?>
     <li class="<?= $activo("stock") ?>">

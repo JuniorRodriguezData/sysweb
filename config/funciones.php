@@ -35,7 +35,21 @@ const PERMISOS_MODULOS = [
     "compras"      => ["Super Admin", "Compras"],
     "form_compras"    => ["Super Admin", "Compras"],
     "detalle_compra"  => ["Super Admin", "Compras"],
-    "ventas"       => ["Super Admin", "Ventas"],
+    // Examen final - Referenciales de compras
+    "u_medida"           => ["Super Admin", "Compras"],
+    "form_u_medida"      => ["Super Admin", "Compras"],
+    "tipo_producto"      => ["Super Admin", "Compras"],
+    "form_tipo_producto" => ["Super Admin", "Compras"],
+    "deposito"           => ["Super Admin", "Compras"],
+    "form_deposito"      => ["Super Admin", "Compras"],
+    "producto"           => ["Super Admin", "Compras"],
+    "form_producto"      => ["Super Admin", "Compras"],
+    "proveedor"          => ["Super Admin", "Compras"],
+    "form_proveedor"     => ["Super Admin", "Compras"],
+    // Examen final - Movimiento de ventas
+    "ventas"        => ["Super Admin", "Ventas"],
+    "form_ventas"   => ["Super Admin", "Ventas"],
+    "detalle_venta" => ["Super Admin", "Ventas"],
     "stock"        => ["Super Admin", "Compras", "Ventas"],
 ];
 
@@ -72,9 +86,17 @@ function csrf_valido(): bool
  */
 function siguiente_codigo(mysqli $mysqli, string $tabla): int
 {
-    $claves = ["departamento" => "id_departamento", "ciudad" => "cod_ciudad", "clientes" => "id_cliente", "compra" => "cod_compra"];
+    $claves = ["departamento" => "id_departamento", "ciudad" => "cod_ciudad", "clientes" => "id_cliente", "compra" => "cod_compra",
+               "u_medida" => "id_u_medida", "tipo_producto" => "cod_tipo_prod", "deposito" => "cod_deposito",
+               "producto" => "cod_producto", "proveedor" => "cod_proveedor", "venta" => "cod_venta"];
     $campo  = $claves[$tabla] ?? throw new InvalidArgumentException("Tabla no permitida: $tabla");
     return (int) $mysqli->query("SELECT COALESCE(MAX($campo), 0) + 1 FROM $tabla")->fetch_row()[0];
+}
+
+/** ¿El texto tiene solo letras (con acentos), números, espacios y signos básicos? */
+function texto_valido(string $texto): bool
+{
+    return (bool) preg_match('/^[\p{L}\p{N} .,\-\/()°&]+$/u', $texto);
 }
 
 /** ¿La excepción de mysqli es por una clave foránea en uso (el registro está referenciado)? */

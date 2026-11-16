@@ -10,14 +10,16 @@ require_once "../../config/reporte.php";
 exigir_permiso_reporte("stock");
 
 $deposito = (int) ($_GET["deposito"] ?? 0);
+$producto = (int) ($_GET["producto"] ?? 0);   // filtro del combo buscador (0 = todos)
 $stmt = $mysqli->prepare("SELECT d.descrip, p.cod_producto, p.p_descrip, u.u_descrip, COALESCE(s.cantidad, 0), p.precio
                           FROM producto p
                           CROSS JOIN deposito d
                           JOIN u_medida u   ON u.id_u_medida  = p.id_u_medida
                           LEFT JOIN stock s ON s.cod_producto = p.cod_producto AND s.cod_deposito = d.cod_deposito
                           WHERE (? = 0 OR d.cod_deposito = ?)
+                            AND (? = 0 OR p.cod_producto = ?)
                           ORDER BY d.cod_deposito, p.p_descrip");
-$stmt->bind_param("ii", $deposito, $deposito);
+$stmt->bind_param("iiii", $deposito, $deposito, $producto, $producto);
 $stmt->execute();
 
 $total = 0;
