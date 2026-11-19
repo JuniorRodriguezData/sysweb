@@ -37,6 +37,9 @@ $module = $_GET["module"] ?? "start";
       /* style.css aclara los fondos verde/rojo; en las etiquetas de estado se necesita contraste */
       .label.label-success { background-color: #00a65a !important; color: #fff; }
       .label.label-danger  { background-color: #dd4b39 !important; color: #fff; }
+      /* La ruta (breadcrumb) va debajo del título para no tapar los botones Agregar / Imprimir */
+      .content-header { overflow: hidden; }
+      .content-header > .breadcrumb { position: static; float: right; margin: 6px 0 0; padding: 0; background: transparent; }
     </style>
 
     <script>
